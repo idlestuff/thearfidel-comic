@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThearFidel Era of Evade - MinhIdle (IdleStuff)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b',
+                        accent: '#6366f1',
+                        accentHover: '#4f46e5'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        /* Dashed box only when editing mode is explicitly active */
+        .editable-active { outline: 2px dashed #6366f1; background-color: rgba(99, 102, 241, 0.05); border-radius: 6px; padding: 2px 6px; transition: all 0.2s; }
+        .editable-active:hover { background-color: rgba(99, 102, 241, 0.12); }
+
+        /* Fandom / Wiki dropdown navigation styling */
+        .wiki-nav-item { position: relative; }
+        .wiki-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 200px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+            z-index: 50;
+            border-radius: 0.75rem;
+            padding: 0.35rem;
+        }
+        .wiki-nav-item:hover > .wiki-dropdown-menu,
+        .wiki-nav-item:focus-within > .wiki-dropdown-menu {
+            display: block;
+        }
+        .wiki-sub-item { position: relative; }
+        .wiki-submenu {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            min-width: 220px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+            border-radius: 0.75rem;
+            padding: 0.35rem;
+            margin-left: 0.25rem;
+        }
+        .wiki-sub-item:hover > .wiki-submenu,
+        .wiki-sub-item:focus-within > .wiki-submenu {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <div id="author-edit-banner" class="bg-indigo-600 text-white px-4 py-2 text-xs font-semibold text-center sticky top-0 z-50 flex items-center justify-center space-x-4 shadow-lg hidden">
+        <span><i class="fa-solid fa-pen-to-square mr-1.5"></i> ĐANG BẬT CHẾ ĐỘ CHỈNH SỬA TÁC GIẢ (Click vào các đoạn văn bản để sửa trực tiếp)</span>
+        <button onclick="saveAllChanges()" class="bg-white text-indigo-700 px-3 py-1 rounded-lg font-bold hover:bg-slate-100 transition shadow">Lưu Thay Đổi</button>
+        <button onclick="toggleEditMode()" class="bg-indigo-800 text-white px-3 py-1 rounded-lg font-semibold hover:bg-indigo-950 transition">Thoát Chỉnh Sửa</button>
+    </div>
+
+    <header class="sticky top-0 z-40 bg-slate-900/85 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-feather-pointed text-white text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-sm sm:text-base tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">THEARFIDEL ERA OF EVADE</span>
+                    <span class="block text-[10px] text-indigo-400 font-medium tracking-widest uppercase">By MinhIdle (IdleStuff)</span>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-indigo-400 bg-slate-800/60">Trang chủ</button>
+                <button onclick="switchTab('reader')" id="nav-reader" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800/40 text-slate-400">Đọc truyện</button>
+                <button onclick="switchTab('world')" id="nav-world" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800/40 text-slate-400">World Building</button>
+                <button onclick="switchTab('map')" id="nav-map" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800/40 text-slate-400">Bản đồ</button>
+                <button onclick="switchTab('wip')" id="nav-wip" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-slate-400 hover:text-white hover:bg-slate-800/40">WIP & Script</button>
+            </nav>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="openAuthorModal()" id="author-nav-btn" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">
+                    <i class="fa-solid fa-lock text-amber-400" id="author-lock-icon"></i>
+                    <span id="author-btn-text">Chế độ Tác giả (Khóa)</span>
+                </button>
+                <button onclick="openUploadModal()" class="hidden sm:inline-flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Đăng Chapter</span>
+                </button>
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1">
+            <button onclick="switchTab('home'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Trang chủ</button>
+            <button onclick="switchTab('reader'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Đọc truyện</button>
+            <button onclick="switchTab('world'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">World Building</button>
+            <button onclick="switchTab('map'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Bản đồ</button>
+            <button onclick="switchTab('wip'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">WIP & Script</button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================= 1. TRANG CHỦ ================= -->
+        <section id="tab-home" class="tab-content space-y-8 animate-fadeIn">
+            <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 shadow-2xl p-6 sm:p-10 lg:p-12">
+                <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                    <div class="lg:col-span-4 flex justify-center">
+                        <div class="relative group">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-2xl blur opacity-30 group-hover:opacity-75 transition duration-500"></div>
+                            <div class="relative w-64 sm:w-72 h-96 rounded-2xl overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl">
+                                <img src="https://placehold.co/400x600/1e293b/6366f1?text=ThearFidel+Era+of+Evade" alt="Bìa Truyện" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/400x600/1e293b/fff?text=Cover'">
+                                <div class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-indigo-400 border border-slate-700">
+                                    Full Color
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-8 space-y-6 text-center lg:text-left">
+                        <div class="flex flex-wrap justify-center lg:justify-start gap-2">
+                            <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold border border-indigo-500/20">Fantasy / Giả tưởng</span>
+                            <span class="px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 text-xs font-semibold border border-violet-500/20">Adventure / Entro & Negen</span>
+                            <span class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-semibold">Đang tiến hành (12 Chương)</span>
+                        </div>
+                        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+                            <span id="editable-title" data-editable="true">ThearFidel Era of Evade</span>
+                        </h1>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl" id="editable-summary" data-editable="true">
+                            Một người bình thường tên Mid tình cờ gặp "người được chọn" Eliza trong một khu rừng. Hy vọng bạn thích thú khi khám phá thế giới giả tưởng hoàn toàn mới của ThearFidel :D
+                        </p>
+                        <div class="flex items-center justify-center lg:justify-start space-x-4 pt-2">
+                            <img src="https://placehold.co/100x100/6366f1/fff?text=M" alt="Author" class="w-12 h-12 rounded-full border-2 border-indigo-500 shadow-md">
+                            <div>
+                                <h4 class="text-sm font-bold text-white" id="editable-author" data-editable="true">MinhIdle (IdleStuff)</h4>
+                                <p class="text-xs text-slate-400">Tác giả & Họa sĩ chính • Cập nhật gần đây</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
+                            <button onclick="switchTab('reader')" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition flex items-center space-x-2">
+                                <i class="fa-solid fa-book-open"></i>
+                                <span>Đọc Từ Chương 1</span>
+                            </button>
+                            <button onclick="switchTab('world')" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm border border-slate-700 transition flex items-center space-x-2">
+                                <i class="fa-solid fa-globe"></i>
+                                <span>Khám Phá Thế Giới (Wiki)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center shadow-lg">
+                    <div class="text-indigo-400 text-2xl font-bold mb-1" id="editable-stat1" data-editable="true">45.2K</div>
+                    <div class="text-xs text-slate-400 font-medium">Tổng Lượt Xem</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center shadow-lg">
+                    <div class="text-violet-400 text-2xl font-bold mb-1" id="editable-stat2" data-editable="true">12</div>
+                    <div class="text-xs text-slate-400 font-medium">Chương Đã Phát Hành</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center shadow-lg">
+                    <div class="text-pink-400 text-2xl font-bold mb-1" id="editable-stat3" data-editable="true">1,480</div>
+                    <div class="text-xs text-slate-400 font-medium">Bình Luận & Thảo Luận</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center shadow-lg">
+                    <div class="text-emerald-400 text-2xl font-bold mb-1" id="editable-stat4" data-editable="true">9.8/10</div>
+                    <div class="text-xs text-slate-400 font-medium">Đánh Giá Bạn Đọc</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-layer-group text-indigo-400"></i>
+                            <span>Danh Sách Chương Mới Nhất</span>
+                        </h3>
+                        <button onclick="switchTab('reader')" class="text-xs font-semibold text-indigo-400 hover:underline">Xem tất cả (12 chương)</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div onclick="selectChapter(12)" class="p-4 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <span class="w-10 h-10 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-sm">Ch.12</span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-white">Chương 12: Cuộc Gặp Gỡ Trong Khu Rừng ThearFidel</h4>
+                                    <p class="text-xs text-slate-400">Đăng ngày 19/10/2026 • 3.4k lượt xem</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                        </div>
+                        <div onclick="selectChapter(11)" class="p-4 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <span class="w-10 h-10 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-sm">Ch.11</span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-slate-200">Chương 11: Bí Mật Của Eliza Và Dòng Chảy Entro</h4>
+                                    <p class="text-xs text-slate-400">Đăng ngày 12/10/2026 • 4.1k lượt xem</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="p-2.5 rounded-xl bg-violet-600/20 text-violet-400">
+                                <i class="fa-solid fa-bullhorn text-lg"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-white">Góc Tác Giả (MinhIdle)</h3>
+                        </div>
+                        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4" id="editable-author-note" data-editable="true">
+                            "Chào mọi người, cảm ơn các bạn đã ghé thăm thế giới ThearFidel! Đừng quên ghé mục World Building -> Hệ Thống Kỹ Năng để tìm hiểu song song 2 nguồn năng lượng Entro và Negen nhé :D"
+                        </p>
+                    </div>
+                    <div class="pt-6">
+                        <button onclick="openUploadModal()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold text-xs shadow-md shadow-indigo-600/20 hover:opacity-90 transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span>Đăng nội dung mới (Tác giả)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 2. ĐỌC TRUYỆN (COMIC READER) ================= -->
+        <section id="tab-reader" class="tab-content space-y-6 animate-fadeIn hidden">
+            <!-- Reader Top Bar Controls -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+                <div class="flex items-center space-x-3">
+                    <label for="chapter-select" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Chương:</label>
+                    <select id="chapter-select" onchange="changeChapter(this.value)" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="12">Chương 12: Cuộc Gặp Gỡ Trong Khu Rừng ThearFidel</option>
+                        <option value="11">Chương 11: Bí Mật Của Eliza Và Dòng Chảy Entro</option>
+                        <option value="10">Chương 10: Hành Trình Trốn Chạy</option>
+                        <option value="9">Chương 9: Vết Nứt Không Gian</option>
+                        <option value="8">Chương 8: Cổ Vật Thất Lạc</option>
+                        <option value="7">Chương 7: Đêm Lạnh Lẽo Ở Vùng Biên Giới</option>
+                        <option value="6">Chương 6: Giao Kèo Với Thợ Săn</option>
+                        <option value="5">Chương 5: Tiếng Gọi Từ Vực Thẳm</option>
+                        <option value="4">Chương 4: Dấu Vết Entro</option>
+                        <option value="3">Chương 3: Chạy Trốn Khỏi Kẻ Truy Đuổi</option>
+                        <option value="2">Chương 2: Đêm Đầu Tiên Trong Rừng Sâu</option>
+                        <option value="1">Chương 1: Người Bình Thường Mid</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <div class="flex bg-slate-800 rounded-xl p-1 border border-slate-700">
+                        <button onclick="setReadingMode('webtoon')" id="mode-webtoon" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Webtoon (Cuộn)</button>
+                        <button onclick="setReadingMode('page')" id="mode-page" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Từng Trang</button>
+                    </div>
+                    <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-xs border border-slate-700">
+                        <i class="fa-solid fa-eye text-indigo-400"></i>
+                        <span id="view-count">3,420 lượt xem</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Comic Display & Chapter List Overview Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left/Main Comic Panels -->
+                <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-8 shadow-2xl flex flex-col items-center justify-center min-h-[600px] relative">
+                    <div class="absolute top-4 left-4 bg-slate-800/80 px-3 py-1.5 rounded-xl text-xs font-semibold text-indigo-300 border border-slate-700 flex items-center space-x-2">
+                        <i class="fa-solid fa-book-open-reader"></i>
+                        <span id="current-reading-label">Đang đọc: Chương 12</span>
+                    </div>
+                    
+                    <div id="comic-panels-container" class="w-full max-w-3xl space-y-4 flex flex-col items-center pt-8">
+                        <!-- Dynamic comic images rendered via JavaScript -->
+                    </div>
+
+                    <!-- Chapter Navigation Buttons at bottom -->
+                    <div class="flex items-center justify-between w-full mt-8 pt-4 border-t border-slate-800">
+                        <button onclick="prevChapter()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center space-x-2 transition">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span>Chương Trước</span>
+                        </button>
+                        <span class="text-xs text-slate-400 font-mono" id="chapter-progress-text">12 / 12 Chương</span>
+                        <button onclick="nextChapter()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center space-x-2 transition">
+                            <span>Chương Tiếp</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="w-full mt-10 pt-6 border-t border-slate-800 text-left space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-comments text-indigo-400"></i>
+                                <span>Bình Luận Độc Giả (<span id="comment-count">148</span>)</span>
+                            </h4>
+                            <span class="text-xs text-slate-400">Thảo luận văn minh</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <input type="text" id="comment-input" placeholder="Viết bình luận của bạn về chương này..." class="flex-grow bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <button onclick="postComment()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow">Gửi</button>
+                        </div>
+                        <div id="comments-list" class="space-y-2 pt-2">
+                            <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/60 text-xs space-y-1">
+                                <div class="flex justify-between font-semibold text-indigo-300">
+                                    <span>HuyAnime99</span>
+                                    <span class="text-[10px] text-slate-500">Hôm qua</span>
+                                </div>
+                                <p class="text-slate-300">Đọc cuốn quá tác giả ơi! Mong chờ sự kết hợp giữa Entro và Negen!</p>
+                            </div>
+                            <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/60 text-xs space-y-1">
+                                <div class="flex justify-between font-semibold text-violet-300">
+                                    <span>LinhNguyên</span>
+                                    <span class="text-[10px] text-slate-500">2 ngày trước</span>
+                                </div>
+                                <p class="text-slate-300">Mid bình thường mà gan dạ thật sự, hóng sức mạnh hệ Entro và sinh khí Negen của Eliza.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar: Comprehensive Chapter List Overview -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col h-[750px]">
+                        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                            <div>
+                                <h4 class="text-sm font-bold text-white flex items-center space-x-2">
+                                    <i class="fa-solid fa-list-ul text-indigo-400"></i>
+                                    <span>Danh Sách Chương (Tổng quát)</span>
+                                </h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Toàn bộ 12 chương đã phát hành</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 text-xs font-bold">12 Ch.</span>
+                        </div>
+                        
+                        <!-- Scrollable Chapter List Items -->
+                        <div id="full-chapter-list-container" class="space-y-2.5 overflow-y-auto custom-scrollbar pr-2 flex-grow">
+                            <div onclick="changeChapter(12)" id="ch-item-12" class="chapter-item p-3 rounded-xl bg-indigo-600/20 border border-indigo-500/40 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">12</span>
+                                    <div>
+                                        <h5 class="text-xs font-bold text-white">Chương 12: Cuộc Gặp Gỡ Rừng ThearFidel</h5>
+                                        <p class="text-[10px] text-slate-400">19/10/2026 • 3.4k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-circle-check text-indigo-400 text-xs"></i>
+                            </div>
+                            <div onclick="changeChapter(11)" id="ch-item-11" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">11</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 11: Bí Mật Eliza & Entro</h5>
+                                        <p class="text-[10px] text-slate-400">12/10/2026 • 4.1k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(10)" id="ch-item-10" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">10</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 10: Hành Trình Trốn Chạy</h5>
+                                        <p class="text-[10px] text-slate-400">05/10/2026 • 3.8k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(9)" id="ch-item-9" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">9</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 9: Vết Nứt Không Gian</h5>
+                                        <p class="text-[10px] text-slate-400">28/09/2026 • 3.2k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(8)" id="ch-item-8" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">8</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 8: Cổ Vật Thất Lạc</h5>
+                                        <p class="text-[10px] text-slate-400">21/09/2026 • 3.5k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(7)" id="ch-item-7" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">7</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 7: Đêm Lạnh Lẽo Ở Biên Giới</h5>
+                                        <p class="text-[10px] text-slate-400">14/09/2026 • 2.9k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(6)" id="ch-item-6" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">6</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 6: Giao Kèo Với Thợ Săn</h5>
+                                        <p class="text-[10px] text-slate-400">07/09/2026 • 3.1k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(5)" id="ch-item-5" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">5</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 5: Tiếng Gọi Từ Vực Thẳm</h5>
+                                        <p class="text-[10px] text-slate-400">31/08/2026 • 3.6k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(4)" id="ch-item-4" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">4</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 4: Dấu Vết Entro</h5>
+                                        <p class="text-[10px] text-slate-400">24/08/2026 • 4.0k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(3)" id="ch-item-3" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">3</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 3: Trốn Chạy Kẻ Truy Đuổi</h5>
+                                        <p class="text-[10px] text-slate-400">17/08/2026 • 4.5k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(2)" id="ch-item-2" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">2</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 2: Đêm Đầu Tiên Trong Rừng</h5>
+                                        <p class="text-[10px] text-slate-400">10/08/2026 • 5.2k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                            <div onclick="changeChapter(1)" id="ch-item-1" class="chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">1</span>
+                                    <div>
+                                        <h5 class="text-xs font-semibold text-slate-200">Chương 1: Người Bình Thường Mid</h5>
+                                        <p class="text-[10px] text-slate-400">03/08/2026 • 7.8k xem</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 3. WORLD BUILDING / WIKI ================= -->
+        <section id="tab-world" class="tab-content space-y-6 animate-fadeIn hidden">
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold border border-indigo-500/20">ThearFidel Universe Wiki</span>
+                            <span class="text-xs text-slate-500 font-mono">• Fandom Style</span>
+                        </div>
+                        <h2 onclick="resetWikiToLanding()" class="text-2xl sm:text-3xl font-extrabold text-white mt-2 tracking-tight cursor-pointer hover:text-indigo-300 transition flex items-center space-x-2">
+                            <span>ThearFidel Lore & Wiki</span>
+                            <span class="text-xs font-normal text-slate-500 hidden sm:inline">(Click để về trang bìa)</span>
+                        </h2>
+                        <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl">Bách khoa toàn thư hệ thống thế giới, quy luật song hệ Entro & Negen, nhân vật, lịch sử và thần binh.</p>
+                    </div>
+
+                    <!-- Breadcrumbs display -->
+                    <div class="bg-slate-800/80 border border-slate-700/80 px-4 py-2 rounded-xl text-xs flex items-center space-x-2 text-slate-300">
+                        <i class="fa-solid fa-compass text-indigo-400"></i>
+                        <span class="text-slate-400">Mục đang xem:</span>
+                        <span id="wiki-breadcrumb" class="text-indigo-300 font-semibold">Tổng Quan / Visual Showcase</span>
+                    </div>
+                </div>
+
+                <!-- Wiki Fandom Dropdown Navigation Bar -->
+                <div class="mt-4 pt-2">
+                    <nav class="flex flex-wrap items-center gap-1 sm:gap-2 text-xs font-medium text-slate-200">
+                        <!-- Dropdown 1: HỆ THỐNG KỸ NĂNG & NĂNG LƯỢNG -->
+                        <div class="wiki-nav-item">
+                            <button class="flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 hover:text-white transition border border-slate-700/70">
+                                <i class="fa-solid fa-atom text-indigo-400"></i>
+                                <span class="font-bold">NĂNG LƯỢNG & KỸ NĂNG</span>
+                                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
+                            </button>
+                            <div class="wiki-dropdown-menu">
+                                <!-- Submenu: Entro -->
+                                <div class="wiki-sub-item">
+                                    <div class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-200 hover:bg-indigo-600/30 hover:text-white cursor-pointer transition">
+                                        <span class="flex items-center space-x-2">
+                                            <i class="fa-solid fa-hourglass-half text-indigo-400 text-xs"></i>
+                                            <span class="font-medium">1. Entro (Entropy)</span>
+                                        </span>
+                                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+                                    </div>
+                                    <div class="wiki-submenu">
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'entro-1', 'Năng Lượng & Kỹ Năng / Entro / Bản Chất')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Bản chất Entro vũ trụ</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'entro-2', 'Năng Lượng & Kỹ Năng / Entro / Biểu Hiện Phân Rã')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Biểu hiện sinh - lão - bệnh - tử</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'entro-3', 'Năng Lượng & Kỹ Năng / Entro / Phép Thuật')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Kiểm soát Phép thuật Entro</a>
+                                    </div>
+                                </div>
+                                <!-- Submenu: Negen -->
+                                <div class="wiki-sub-item">
+                                    <div class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-200 hover:bg-emerald-600/30 hover:text-white cursor-pointer transition">
+                                        <span class="flex items-center space-x-2">
+                                            <i class="fa-solid fa-seedling text-emerald-400 text-xs"></i>
+                                            <span class="font-medium">2. Negen (Sinh Khí)</span>
+                                        </span>
+                                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+                                    </div>
+                                    <div class="wiki-submenu">
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'negen-1', 'Năng Lượng & Kỹ Năng / Negen / Sinh Khí')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Năng lượng sinh tồn nguyên thủy</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'negen-2', 'Năng Lượng & Kỹ Năng / Negen / Kìm Hãm Phân Rã')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Kìm hãm Entro & Chữa lành</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'negen-3', 'Năng Lượng & Kỹ Năng / Negen / Đối Trọng')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Sự cân bằng song hệ</a>
+                                    </div>
+                                </div>
+                                <div class="h-[1px] bg-slate-800 my-1"></div>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'all-skills', 'Năng Lượng & Kỹ Năng / Tổng Quan Cả Hai Hệ')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-indigo-400 font-semibold">Xem toàn bộ hệ thống</a>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown 2: NHÂN VẬT & STATS -->
+                        <div class="wiki-nav-item">
+                            <button class="flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 hover:text-white transition border border-slate-700/70">
+                                <i class="fa-solid fa-user-group text-violet-400"></i>
+                                <span class="font-bold">NHÂN VẬT</span>
+                                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
+                            </button>
+                            <div class="wiki-dropdown-menu">
+                                <div class="wiki-sub-item">
+                                    <div class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+                                        <span>Tuyến Nhân Vật Chính</span>
+                                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+                                    </div>
+                                    <div class="wiki-submenu">
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'char-mid', 'Nhân Vật / Mid (Nhân vật chính)')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-indigo-300 hover:text-white">Mid (Người phàm)</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'char-eliza', 'Nhân Vật / Eliza (Người được chọn)')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-violet-300 hover:text-white">Eliza (Người được chọn)</a>
+                                    </div>
+                                </div>
+                                <div class="wiki-sub-item">
+                                    <div class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+                                        <span>Phe Phái & Thợ Săn</span>
+                                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+                                    </div>
+                                    <div class="wiki-submenu">
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'all-chars', 'Nhân Vật / Phe Thợ Săn Rừng Sâu')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Thợ Săn Rừng Sâu</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'all-chars', 'Nhân Vật / Kẻ Truy Đuổi')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Quân Đoàn Truy Đuổi</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown 3: CHỦNG TỘC (RACES) -->
+                        <div class="wiki-nav-item">
+                            <button class="flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 hover:text-white transition border border-slate-700/70">
+                                <i class="fa-solid fa-dna text-pink-400"></i>
+                                <span class="font-bold">CHỦNG TỘC</span>
+                                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
+                            </button>
+                            <div class="wiki-dropdown-menu">
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('races', 'race-mortals', 'Chủng Tộc / Loài Người Phàm (Mortals)')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Loài Người Phàm (Mortals)</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('races', 'race-mutants', 'Chủng Tộc / Thực Thể Biến Dị Entro')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Dị Thể Hấp Thụ Entro</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('races', 'race-negen', 'Chủng Tộc / Linh Tộc Negen')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Linh Tộc Nuôi Dưỡng Negen</a>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown 4: LỊCH SỬ & ĐỊA LÝ -->
+                        <div class="wiki-nav-item">
+                            <button class="flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 hover:text-white transition border border-slate-700/70">
+                                <i class="fa-solid fa-landmark text-amber-400"></i>
+                                <span class="font-bold">LỊCH SỬ & ĐỊA LÝ</span>
+                                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
+                            </button>
+                            <div class="wiki-dropdown-menu">
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('history', 'hist-epochs', 'Lịch Sử / Các Kỷ Nguyên Suy Tàn')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Kỷ Nguyên Suy Tàn & Tái Thiết</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('history', 'hist-forest', 'Địa Lý / Khu Rừng ThearFidel')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Khu Rừng Nguyên Sinh ThearFidel</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('history', 'hist-border', 'Địa Lý / Vùng Lãnh Nguyên Biên Giới')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Vùng Lãnh Nguyên Biên Giới</a>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown 5: VẬT PHẨM & CỔ VẬT -->
+                        <div class="wiki-nav-item">
+                            <button class="flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 hover:text-white transition border border-slate-700/70">
+                                <i class="fa-solid fa-shield-halved text-cyan-400"></i>
+                                <span class="font-bold">VẬT PHẨM</span>
+                                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
+                            </button>
+                            <div class="wiki-dropdown-menu">
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('items', 'items-decay', 'Vật Phẩm / Cổ Vật Trì Hoãn Entro')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Cổ Vật Trì Hoãn Phân Rã</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('items', 'items-crystal', 'Vật Phẩm / Thạch Sinh Mệnh Negen')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Thạch Sinh Mệnh Khuếch Đại Negen</a>
+                            </div>
+                        </div>
+
+                        <!-- Reset / Home Wiki Button -->
+                        <button onclick="resetWikiToLanding()" class="flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-white transition border border-slate-700/50 text-xs">
+                            <i class="fa-solid fa-image text-slate-400"></i>
+                            <span>Hình Nền & Poster</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <div id="wiki-content-area" class="space-y-6">
+                <!-- DEFAULT LANDING: VISUAL BACKGROUND & CHARACTER SHOWCASE -->
+                <div id="wiki-landing" class="space-y-6 animate-fadeIn">
+                    <!-- Hero Wallpaper Banner of the Universe -->
+                    <div class="relative w-full h-80 sm:h-96 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl group">
+                        <img src="https://placehold.co/1280x720/090d16/6366f1?text=THEARFIDEL+PRIMEVAL+FOREST+ARTWORK" alt="ThearFidel Concept Art" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
+                        <div class="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+                            <div class="space-y-2">
+                                <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/30 backdrop-blur-md">
+                                    <i class="fa-solid fa-palette mr-1"></i> Concept Art & World Atmosphere
+                                </span>
+                                <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Khu Rừng Nguyên Sinh ThearFidel</h3>
+                                <p class="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+                                    Nơi giao thoa giữa sương mù Entro huyền ảo và mạch suối nguồn sinh khí Negen. Chọn các mục trên menu để tra cứu thông tin chi tiết.
+                                </p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="viewWikiArticle('skills', 'entro-1', 'Năng Lượng & Kỹ Năng / Entro')" class="px-4 py-2 rounded-xl bg-indigo-600/90 hover:bg-indigo-600 text-white text-xs font-semibold shadow-lg backdrop-blur-md transition flex items-center space-x-1.5">
+                                    <span>Hệ Thống Entro</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Character Concept Posters Showcase (Mid & Eliza) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Card 1: Mid -->
+                        <div onclick="viewWikiArticle('characters', 'char-mid', 'Nhân Vật / Mid (Nhân vật chính)')" class="group relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 p-6 hover:border-indigo-500/60 transition duration-300 cursor-pointer shadow-xl">
+                            <div class="flex items-center space-x-5">
+                                <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 flex-shrink-0 group-hover:scale-105 transition duration-300">
+                                    <img src="https://placehold.co/300x300/1e293b/6366f1?text=MID" alt="Mid" class="w-full h-full object-cover">
+                                    <span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-900/80 text-indigo-400">Mortal</span>
+                                </div>
+                                <div class="space-y-1.5 flex-grow">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Nhân vật chính</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-600 group-hover:text-indigo-400 transition"></i>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-white group-hover:text-indigo-300 transition">Mid</h4>
+                                    <p class="text-xs text-slate-400 line-clamp-2">Người bình thường tình cờ bước chân vào khu rừng huyền bí và chạm trán định mệnh.</p>
+                                    <div class="pt-1 flex items-center space-x-2 text-[11px] text-slate-500">
+                                        <span>Kháng Entro: 62%</span>
+                                        <span>•</span>
+                                        <span>Evade: 88</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Eliza -->
+                        <div onclick="viewWikiArticle('characters', 'char-eliza', 'Nhân Vật / Eliza (Người được chọn)')" class="group relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 p-6 hover:border-violet-500/60 transition duration-300 cursor-pointer shadow-xl">
+                            <div class="flex items-center space-x-5">
+                                <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 flex-shrink-0 group-hover:scale-105 transition duration-300">
+                                    <img src="https://placehold.co/300x300/1e293b/a855f7?text=ELIZA" alt="Eliza" class="w-full h-full object-cover">
+                                    <span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-900/80 text-violet-400">Chosen</span>
+                                </div>
+                                <div class="space-y-1.5 flex-grow">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-semibold text-violet-400 uppercase tracking-wider">Người được chọn</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-600 group-hover:text-violet-400 transition"></i>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-white group-hover:text-violet-300 transition">Eliza</h4>
+                                    <p class="text-xs text-slate-400 line-clamp-2">Thiếu nữ mang sứ mệnh dung hòa hai luồng năng lượng đối trọng Entro và Negen.</p>
+                                    <div class="pt-1 flex items-center space-x-2 text-[11px] text-slate-500">
+                                        <span>Khống Chế Entro: 92%</span>
+                                        <span>•</span>
+                                        <span>Sinh Khí: 99%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 1: Races -->
+                <div id="wiki-races" class="wiki-section grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+                    <div id="card-race-mortals" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 transition duration-300">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Loài Người Phàm (Mortals)</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-race-1" data-editable="true">
+                            Cư dân bình thường chịu sự chi phối mạnh mẽ của dòng chảy Entro (sinh, lão, bệnh, tử). Mid là một đại diện điển hình cho sự kiên cường trước quy luật vũ trụ.
+                        </p>
+                    </div>
+                    <div id="card-race-mutants" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 transition duration-300">
+                        <div class="w-12 h-12 rounded-xl bg-rose-600/20 text-rose-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-skull"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Thực Thể Biến Dị Entro</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-race-2" data-editable="true">
+                            Những sinh vật sinh sống ở các hố sụt không gian sâu trong khu rừng, nơi quá trình phân rã diễn ra đột ngột biến đổi hình thái cơ thể và cấu trúc sinh học.
+                        </p>
+                    </div>
+                    <div id="card-race-negen" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 transition duration-300">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-leaf"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Linh Tộc Nuôi Dưỡng Negen</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-race-3" data-editable="true">
+                            Chủng tộc cổ đại gắn bó với mạch đất và sinh khí nguyên thủy, có khả năng kích phát sự sinh sôi và chữa lành các vết hoại tử do Entro gây ra.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Section 2: History & Geography -->
+                <div id="wiki-history" class="wiki-section hidden space-y-6">
+                    <div id="card-hist-epochs" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4 transition duration-300">
+                        <div class="flex items-center space-x-3 text-amber-400">
+                            <i class="fa-solid fa-scroll text-xl"></i>
+                            <h3 class="text-xl font-bold text-white">Lịch Sử & Các Kỷ Nguyên ThearFidel</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-history-1" data-editable="true">
+                            Thế giới ThearFidel ghi nhận các chu kỳ lặp lại: khi dòng Entro tăng cao, các nền văn minh bước vào giai đoạn thoái trào và phân rã. Sự xuất hiện của các nguồn sinh khí Negen lớn sau đó giúp cân bằng và tái sinh vạn vật.
+                        </p>
+                    </div>
+                    <div id="card-hist-forest" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4 transition duration-300">
+                        <div class="flex items-center space-x-3 text-indigo-400">
+                            <i class="fa-solid fa-tree text-xl"></i>
+                            <h3 class="text-xl font-bold text-white">Khu Rừng Nguyên Sinh ThearFidel</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-history-2" data-editable="true">
+                            Tâm điểm khởi đầu của tác phẩm, nơi Mid lần đầu chạm trán Eliza. Khu rừng rậm rạp được bao bọc bởi cả lớp sương mù Entro dày đặc và những suối nguồn Negen ẩn sâu dưới các rễ cây cổ thụ.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Section 3: Characters & Stats -->
+                <div id="wiki-characters" class="wiki-section space-y-6 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div id="card-char-mid" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 transition duration-300">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold text-indigo-400 flex items-center space-x-2">
+                                    <i class="fa-solid fa-user-astronaut"></i>
+                                    <span>Mid (Nhân vật chính)</span>
+                                </h3>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Mortal</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed" id="editable-char-mid" data-editable="true">Một người bình thường tình cờ gặp "người được chọn" Eliza trong khu rừng. Dù không có huyết thống thần thánh, Mid sở hữu sự nhạy cảm kỳ lạ trước dòng chảy biến đổi của Entro.</p>
+                            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 space-y-2 text-xs">
+                                <div class="flex justify-between text-slate-400"><span>Kháng Phân Rã (Entro Res):</span><span class="text-white font-mono font-bold">62%</span></div>
+                                <div class="flex justify-between text-slate-400"><span>Tiếp Nhận Sinh Khí (Negen Af):</span><span class="text-white font-mono font-bold">45%</span></div>
+                                <div class="flex justify-between text-slate-400"><span>Sức Bền & Thích Ứng (Evade):</span><span class="text-indigo-400 font-mono font-bold">88/100</span></div>
+                            </div>
+                        </div>
+
+                        <div id="card-char-eliza" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 transition duration-300">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold text-violet-400 flex items-center space-x-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span>Eliza (Người được chọn)</span>
+                                </h3>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400 border border-violet-500/20">Chosen One</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed" id="editable-char-eliza" data-editable="true">Thiếu nữ mang sứ mệnh đặc biệt nắm giữ chìa khóa dung hợp giữa dòng chảy Entro và Sinh Khí Negen, mục tiêu của các phe phái săn lùng trên khắp ThearFidel.</p>
+                            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 space-y-2 text-xs">
+                                <div class="flex justify-between text-slate-400"><span>Khống Chế Entro (Entropy Control):</span><span class="text-white font-mono font-bold">92%</span></div>
+                                <div class="flex justify-between text-slate-400"><span>Sinh Khí Negen (Vitality Overflow):</span><span class="text-emerald-400 font-mono font-bold">99%</span></div>
+                                <div class="flex justify-between text-slate-400"><span>Tương Thích Cổ Vật:</span><span class="text-violet-400 font-mono font-bold">95/100</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Items -->
+                <div id="wiki-items" class="wiki-section hidden space-y-6">
+                    <div id="card-items-decay" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 transition duration-300">
+                        <div class="flex items-center space-x-3 text-cyan-400">
+                            <i class="fa-solid fa-hourglass-start text-xl"></i>
+                            <h3 class="text-xl font-bold text-white">Cổ Vật Trì Hoãn Entro (Stasis Artifacts)</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-items-desc" data-editable="true">
+                            Các bảo vật cổ xưa có khả năng cô lập trường năng lượng, làm chậm quá trình phân rã tự nhiên của vật chất và cơ thể sinh học đến mức gần như bất biến.
+                        </p>
+                    </div>
+                    <div id="card-items-crystal" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 transition duration-300">
+                        <div class="flex items-center space-x-3 text-emerald-400">
+                            <i class="fa-solid fa-gem text-xl"></i>
+                            <h3 class="text-xl font-bold text-white">Thạch Sinh Mệnh Negen (Vitality Cores)</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-items-desc2" data-editable="true">
+                            Tinh thể kết tụ từ nguồn sinh khí tinh khiết nhất, khi kích hoạt có thể ngay lập tức đảo ngược các vết hoại tử và phục hồi nguồn sống cho sinh vật.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Section 5: DUAL ENERGY SYSTEM WIKI: ENTRO & NEGEN -->
+                <div id="wiki-skills" class="wiki-section space-y-6 hidden">
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+                        <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                            <div class="w-12 h-12 rounded-xl bg-violet-600/20 text-violet-400 flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid fa-atom"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Hệ Thống Kỹ Năng & Song Hệ Năng Lượng (Entro & Negen)</h3>
+                                <p class="text-xs text-slate-400">Quy luật vận hành vạn vật, bản chất phép thuật và đối trọng sinh khí trong ThearFidel</p>
+                            </div>
+                        </div>
+
+                        <!-- 1. Entro Branch -->
+                        <div id="card-entro-block" class="space-y-3 bg-slate-800/40 p-5 rounded-2xl border border-slate-700/60 transition duration-300">
+                            <h4 class="text-sm font-bold text-indigo-400 uppercase tracking-wider flex items-center space-x-2">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                                <span>1. Entro (Cảm hứng từ Entropy) - Năng Lượng Phân Rã</span>
+                            </h4>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-entro-1" data-editable="true">
+                                <b>Bản chất:</b> Là dạng năng lượng tối thượng giúp vũ trụ vận hành vạn vật. Bất cứ thứ gì tồn tại trên vũ trụ từ động thực vật đến những vật chất vô tri tất tần tật đều chứa Entro và cho Entro đi qua.
+                            </p>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-entro-2" data-editable="true">
+                                <b>Biểu hiện:</b> Khiến cho vạn vật đều có xu hướng tan rã theo thời gian. Động vật có sinh, già, bệnh, chết. Thực vật có gieo, nảy mầm, già và héo khô. Vật chất chuyển đổi trạng thái (nóng sang lạnh...).
+                            </p>
+                            <p class="text-xs sm:text-sm text-indigo-300 font-medium leading-relaxed pt-1" id="editable-entro-3" data-editable="true">
+                                💡 <b>Phép Thuật Entro:</b> Nắm được phương thức sử dụng Entro chính là nắm được cách kiểm soát quá trình phân rã hay chuyển hóa trên.
+                            </p>
+                        </div>
+
+                        <!-- 2. Negen Branch -->
+                        <div id="card-negen-block" class="space-y-3 bg-slate-800/40 p-5 rounded-2xl border border-slate-700/60 transition duration-300">
+                            <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center space-x-2">
+                                <i class="fa-solid fa-seedling"></i>
+                                <span>2. Negen (Năng Lượng Sống / Sinh Khí) - Cội Nguồn Sinh Tồn</span>
+                            </h4>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-negen-1" data-editable="true">
+                                <b>Bản chất:</b> Là năng lượng sinh tồn nguyên thủy, trong dân gian thường gọi đơn giản là <b>"sinh khí"</b>. Đây là nguồn lực nuôi dưỡng sự sống, kích thích sinh sôi, bồi đắp và bảo vệ thể phách lẫn linh hồn.
+                            </p>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="editable-negen-2" data-editable="true">
+                                <b>Tương tác đối trọng:</b> Negen là tấm khiên tự nhiên chống lại sự cắn mọt của Entro. Nơi nào có sinh khí Negen dồi dào, tốc độ phân rã bị kìm hãm, cây cối xanh tươi và vết thương nhanh chóng lành lặn.
+                            </p>
+                            <p class="text-xs sm:text-sm text-emerald-300 font-medium leading-relaxed pt-1" id="editable-negen-3" data-editable="true">
+                                💡 <b>Sự Cân Bằng:</b> Sự kết hợp và xung đột giữa Entro (phân rã) và Negen (sinh sôi) tạo nên chiều sâu chiến đấu và phép thuật trong toàn bộ thế giới ThearFidel.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 4. BẢN ĐỒ (MAP) ================= -->
+        <section id="tab-map" class="tab-content space-y-6 animate-fadeIn hidden">
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex justify-between items-center">
+                <div>
+                    <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold border border-indigo-500/20">Interactive Universe Map</span>
+                    <h2 class="text-2xl font-bold text-white mt-2">Bản Đồ Thế Giới ThearFidel</h2>
+                    <p class="text-slate-300 text-xs sm:text-sm mt-1">Cập nhật vị trí nhân vật (Mid & Eliza), biên giới quốc gia và vùng Entro/Negen đậm đặc.</p>
+                </div>
+            </div>
+            <div class="relative w-full h-[500px] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl flex items-center justify-center">
+                <img src="https://placehold.co/1200x700/0f172a/334155?text=THEARFIDEL+MAP+OVERVIEW" alt="Map" class="w-full h-full object-cover opacity-60">
+            </div>
+        </section>
+
+        <!-- ================= 5. WIP & SCRIPT ================= -->
+        <section id="tab-wip" class="tab-content hidden space-y-6 animate-fadeIn">
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <span class="px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 text-xs font-semibold border border-violet-500/20">Behind The Scenes</span>
+                <h2 class="text-2xl font-extrabold text-white mt-2">WIP Sketches & Kịch Bản Văn Bản</h2>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= AUTHOR LOGIN MODAL ================= -->
+    <div id="author-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 animate-fadeIn">
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-key text-indigo-400"></i>
+                    <span>Xác Thực Tác Giả</span>
+                </h3>
+                <button onclick="closeAuthorModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-300">Nhập mật khẩu tác giả để bật chế độ chỉnh sửa nội dung trang web (Mật khẩu: <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">minhidle2026</code>).</p>
+            <div>
+                <input type="password" id="author-password-input" placeholder="Nhập mật khẩu tác giả..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <p id="author-login-error" class="text-xs text-rose-400 mt-1 hidden">Mật khẩu không chính xác!</p>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="closeAuthorModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">Hủy</button>
+                <button onclick="verifyAuthorPassword()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20">Xác Nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload / Admin Modal Simulator -->
+    <div id="upload-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 relative animate-fadeIn">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-indigo-400"></i>
+                    <span>Tải Lên Chương Mới</span>
+                </h3>
+                <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tiêu đề chương</label>
+                    <input type="text" placeholder="Ví dụ: Chương 13: Giao Thoa Entro & Negen" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button onclick="closeUploadModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">Hủy</button>
+                <button onclick="submitUpload()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg">Đăng Ngay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <div>© 2026 ThearFidel Universe. Creator Hub by MinhIdle (IdleStuff). All rights reserved.</div>
+            <div class="flex space-x-4">
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook text-base"></i></a>
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-discord text-base"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let isAuthorAuthenticated = false;
+        let isEditModeActive = false;
+        let currentChapterNum = 12;
+
+        // DỮ LIỆU CÁC CHƯƠNG VÀ DANH SÁCH ẢNH (BẠN CHỈ CẦN THAY LINK ẢNH VÀO ĐÂY)
+        const CHAPTERS_DATA = {
+            12: {
+                title: "Chương 12: Cuộc Gặp Gỡ Trong Khu Rừng ThearFidel",
+                date: "19/10/2026",
+                views: "3,420 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.12+Trang+1",
+                    "https://placehold.co/800x1200/1e293b/4f46e5?text=ThearFidel+Ch.12+Trang+2",
+                    "https://placehold.co/800x1200/1e293b/4338ca?text=ThearFidel+Ch.12+Trang+3"
+                ]
+            },
+            11: {
+                title: "Chương 11: Bí Mật Của Eliza Và Dòng Chảy Entro",
+                date: "12/10/2026",
+                views: "4,110 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.11+Trang+1",
+                    "https://placehold.co/800x1200/1e293b/4f46e5?text=ThearFidel+Ch.11+Trang+2"
+                ]
+            },
+            10: {
+                title: "Chương 10: Hành Trình Trốn Chạy",
+                date: "05/10/2026",
+                views: "3,850 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.10+Trang+1",
+                    "https://placehold.co/800x1200/1e293b/4f46e5?text=ThearFidel+Ch.10+Trang+2"
+                ]
+            },
+            9: {
+                title: "Chương 9: Vết Nứt Không Gian",
+                date: "28/09/2026",
+                views: "3,210 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.9+Trang+1"
+                ]
+            },
+            8: {
+                title: "Chương 8: Cổ Vật Thất Lạc",
+                date: "21/09/2026",
+                views: "3,500 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.8+Trang+1"
+                ]
+            },
+            7: {
+                title: "Chương 7: Đêm Lạnh Lẽo Ở Vùng Biên Giới",
+                date: "14/09/2026",
+                views: "2,980 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.7+Trang+1"
+                ]
+            },
+            6: {
+                title: "Chương 6: Giao Kèo Với Thợ Săn",
+                date: "07/09/2026",
+                views: "3,120 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.6+Trang+1"
+                ]
+            },
+            5: {
+                title: "Chương 5: Tiếng Gọi Từ Vực Thẳm",
+                date: "31/08/2026",
+                views: "3,670 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.5+Trang+1"
+                ]
+            },
+            4: {
+                title: "Chương 4: Dấu Vết Entro",
+                date: "24/08/2026",
+                views: "4,030 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.4+Trang+1"
+                ]
+            },
+            3: {
+                title: "Chương 3: Chạy Trốn Khỏi Kẻ Truy Đuổi",
+                date: "17/08/2026",
+                views: "4,510 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.3+Trang+1"
+                ]
+            },
+            2: {
+                title: "Chương 2: Đêm Đầu Tiên Trong Rừng Sâu",
+                date: "10/08/2026",
+                views: "5,200 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.2+Trang+1"
+                ]
+            },
+            1: {
+                title: "Chương 1: Người Bình Thường Mid",
+                date: "03/08/2026",
+                views: "7,820 lượt xem",
+                pages: [
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.1+Trang+1",
+                    "https://placehold.co/800x1200/1e293b/4f46e5?text=ThearFidel+Ch.1+Trang+2"
+                ]
+            }
+        };
+
+        window.onload = function() {
+            // Load saved custom edits from localStorage
+            const savedData = JSON.parse(localStorage.getItem('thearfidel_saved_content') || '{}');
+            for (const [id, htmlContent] of Object.entries(savedData)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = htmlContent;
+                }
+            }
+
+            // Check if author was previously authenticated in this session
+            if (localStorage.getItem('thearfidel_author_auth') === 'true') {
+                isAuthorAuthenticated = true;
+                updateAuthorUIState();
+            }
+
+            // Render default chapter
+            renderChapterPages(currentChapterNum);
+        };
+
+        function renderChapterPages(chNum) {
+            const container = document.getElementById('comic-panels-container');
+            if (!container) return;
+
+            const chapterInfo = CHAPTERS_DATA[chNum] || {
+                title: `Chương ${chNum}`,
+                views: '1.2k lượt xem',
+                pages: [`https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.${chNum}+Trang+1`]
+            };
+
+            // Update views display
+            const viewCountEl = document.getElementById('view-count');
+            if (viewCountEl && chapterInfo.views) {
+                viewCountEl.innerText = chapterInfo.views;
+            }
+
+            // Generate HTML for each panel
+            container.innerHTML = chapterInfo.pages.map((imgUrl, index) => `
+                <div class="w-full bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-md">
+                    <img src="${imgUrl}" alt="Chương ${chNum} - Trang ${index + 1}" class="w-full h-auto object-cover" loading="lazy" onerror="this.src='https://placehold.co/800x1200/1e293b/fff?text=Trang+${index + 1}'">
+                </div>
+            `).join('');
+        }
+
+        function changeChapter(chNum) {
+            currentChapterNum = parseInt(chNum);
+            const selectEl = document.getElementById('chapter-select');
+            if (selectEl) selectEl.value = currentChapterNum;
+
+            const chapterInfo = CHAPTERS_DATA[currentChapterNum];
+            const readingLabel = document.getElementById('current-reading-label');
+            if (readingLabel) {
+                readingLabel.innerText = chapterInfo ? `Đang đọc: ${chapterInfo.title}` : `Đang đọc: Chương ${currentChapterNum}`;
+            }
+
+            const progressText = document.getElementById('chapter-progress-text');
+            if (progressText) progressText.innerText = `${currentChapterNum} / 12 Chương`;
+
+            // Highlight sidebar list
+            document.querySelectorAll('.chapter-item').forEach(item => {
+                item.className = "chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between";
+                const icon = item.querySelector('i');
+                if (icon) icon.className = "fa-solid fa-chevron-right text-slate-600 text-[10px]";
+                const spanNum = item.querySelector('span');
+                if (spanNum) spanNum.className = "w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs";
+                const titleEl = item.querySelector('h5');
+                if (titleEl) titleEl.className = "text-xs font-semibold text-slate-200";
+            });
+
+            const activeItem = document.getElementById('ch-item-' + currentChapterNum);
+            if (activeItem) {
+                activeItem.className = "chapter-item p-3 rounded-xl bg-indigo-600/20 border border-indigo-500/40 cursor-pointer transition flex items-center justify-between";
+                const activeIcon = activeItem.querySelector('i');
+                if (activeIcon) activeIcon.className = "fa-solid fa-circle-check text-indigo-400 text-xs";
+                const activeNum = activeItem.querySelector('span');
+                if (activeNum) activeNum.className = "w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs";
+                const activeTitle = activeItem.querySelector('h5');
+                if (activeTitle) activeTitle.className = "text-xs font-bold text-white";
+            }
+
+            // Render actual images for this chapter
+            renderChapterPages(currentChapterNum);
+
+            switchTab('reader');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function selectChapter(chNum) {
+            changeChapter(chNum);
+        }
+
+        function prevChapter() {
+            if (currentChapterNum > 1) {
+                changeChapter(currentChapterNum - 1);
+            }
+        }
+
+        function nextChapter() {
+            if (currentChapterNum < 12) {
+                changeChapter(currentChapterNum + 1);
+            }
+        }
+
+        function postComment() {
+            const input = document.getElementById('comment-input');
+            const list = document.getElementById('comments-list');
+            if (input && input.value.trim() !== '') {
+                const text = input.value.trim();
+                const newComment = document.createElement('div');
+                newComment.className = "bg-slate-800/40 p-3 rounded-xl border border-slate-700/60 text-xs space-y-1 animate-fadeIn";
+                newComment.innerHTML = `
+                    <div class="flex justify-between font-semibold text-indigo-300">
+                        <span>Bạn (Khách)</span>
+                        <span class="text-[10px] text-slate-500">Vừa xong</span>
+                    </div>
+                    <p class="text-slate-300">${text}</p>
+                `;
+                list.insertBefore(newComment, list.firstChild);
+                input.value = '';
+                
+                const countEl = document.getElementById('comment-count');
+                if (countEl) {
+                    let count = parseInt(countEl.innerText || '148');
+                    countEl.innerText = count + 1;
+                }
+            }
+        }
+
+        function openUploadModal() {
+            if (!isAuthorAuthenticated) {
+                alert('Vui lòng đăng nhập Chế độ Tác giả trước khi đăng chương mới!');
+                openAuthorModal();
+                return;
+            }
+            const modal = document.getElementById('upload-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeUploadModal() {
+            const modal = document.getElementById('upload-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function submitUpload() {
+            closeUploadModal();
+            alert('Đã tải lên chương mới thành công!');
+        }
+    </script>
+</body>
+</html>
