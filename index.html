@@ -32,9 +32,18 @@
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        
         /* Dashed box only when editing mode is explicitly active */
-        .editable-active { outline: 2px dashed #6366f1; background-color: rgba(99, 102, 241, 0.05); border-radius: 6px; padding: 2px 6px; transition: all 0.2s; }
-        .editable-active:hover { background-color: rgba(99, 102, 241, 0.12); }
+        .editable-active { 
+            outline: 2px dashed #6366f1 !important; 
+            background-color: rgba(99, 102, 241, 0.08) !important; 
+            border-radius: 6px; 
+            padding: 2px 6px; 
+            transition: all 0.2s; 
+        }
+        .editable-active:hover { 
+            background-color: rgba(99, 102, 241, 0.16) !important; 
+        }
 
         /* Fandom / Wiki dropdown navigation styling */
         .wiki-nav-item { position: relative; }
@@ -43,10 +52,10 @@
             position: absolute;
             top: 100%;
             left: 0;
-            min-width: 200px;
+            min-width: 210px;
             background: #0f172a;
             border: 1px solid #334155;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
             z-index: 50;
             border-radius: 0.75rem;
             padding: 0.35rem;
@@ -61,10 +70,10 @@
             position: absolute;
             top: 0;
             left: 100%;
-            min-width: 220px;
+            min-width: 230px;
             background: #1e293b;
             border: 1px solid #334155;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
             border-radius: 0.75rem;
             padding: 0.35rem;
             margin-left: 0.25rem;
@@ -73,16 +82,26 @@
         .wiki-sub-item:focus-within > .wiki-submenu {
             display: block;
         }
+        .highlight-pulse {
+            animation: pulseGlow 1.5s ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.8); }
+            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
 
+    <!-- Top Author Notification Banner -->
     <div id="author-edit-banner" class="bg-indigo-600 text-white px-4 py-2 text-xs font-semibold text-center sticky top-0 z-50 flex items-center justify-center space-x-4 shadow-lg hidden">
-        <span><i class="fa-solid fa-pen-to-square mr-1.5"></i> ĐANG BẬT CHẾ ĐỘ CHỈNH SỬA TÁC GIẢ (Click vào các đoạn văn bản để sửa trực tiếp)</span>
+        <span><i class="fa-solid fa-pen-to-square mr-1.5"></i> ĐANG BẬT CHẾ ĐỘ CHỈNH SỬA TÁC GIẢ (Click vào văn bản để sửa)</span>
         <button onclick="saveAllChanges()" class="bg-white text-indigo-700 px-3 py-1 rounded-lg font-bold hover:bg-slate-100 transition shadow">Lưu Thay Đổi</button>
         <button onclick="toggleEditMode()" class="bg-indigo-800 text-white px-3 py-1 rounded-lg font-semibold hover:bg-indigo-950 transition">Thoát Chỉnh Sửa</button>
     </div>
 
+    <!-- Header Navigation -->
     <header class="sticky top-0 z-40 bg-slate-900/85 backdrop-blur-md border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
@@ -118,6 +137,7 @@
             </div>
         </div>
 
+        <!-- Mobile Menu Dropdown -->
         <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1">
             <button onclick="switchTab('home'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Trang chủ</button>
             <button onclick="switchTab('reader'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Đọc truyện</button>
@@ -129,7 +149,7 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- ================= 1. TRANG CHỦ ================= -->
+        <!-- ================= 1. TRANG CHỦ (HOME) ================= -->
         <section id="tab-home" class="tab-content space-y-8 animate-fadeIn">
             <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 shadow-2xl p-6 sm:p-10 lg:p-12">
                 <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -148,7 +168,7 @@
                     <div class="lg:col-span-8 space-y-6 text-center lg:text-left">
                         <div class="flex flex-wrap justify-center lg:justify-start gap-2">
                             <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold border border-indigo-500/20">Fantasy / Giả tưởng</span>
-                            <span class="px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 text-xs font-semibold border border-violet-500/20">Adventure / Entro & Negen</span>
+                            <span class="px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 text-xs font-semibold border border-violet-500/20">Song hệ Entro & Negen</span>
                             <span class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-semibold">Đang tiến hành (12 Chương)</span>
                         </div>
                         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
@@ -178,6 +198,7 @@
                 </div>
             </div>
 
+            <!-- Stats Overview -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center shadow-lg">
                     <div class="text-indigo-400 text-2xl font-bold mb-1" id="editable-stat1" data-editable="true">45.2K</div>
@@ -189,7 +210,7 @@
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center shadow-lg">
                     <div class="text-pink-400 text-2xl font-bold mb-1" id="editable-stat3" data-editable="true">1,480</div>
-                    <div class="text-xs text-slate-400 font-medium">Bình Luận & Thảo Luận</div>
+                    <div class="text-xs text-slate-400 font-medium">Bình Luận Độc Giả</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center shadow-lg">
                     <div class="text-emerald-400 text-2xl font-bold mb-1" id="editable-stat4" data-editable="true">9.8/10</div>
@@ -197,6 +218,7 @@
                 </div>
             </div>
 
+            <!-- Latest Chapters List & Author Note -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
                     <div class="flex items-center justify-between mb-6">
@@ -239,7 +261,7 @@
                             <h3 class="text-base font-bold text-white">Góc Tác Giả (MinhIdle)</h3>
                         </div>
                         <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4" id="editable-author-note" data-editable="true">
-                            "Chào mọi người, cảm ơn các bạn đã ghé thăm thế giới ThearFidel! Đừng quên ghé mục World Building -> Hệ Thống Kỹ Năng để tìm hiểu song song 2 nguồn năng lượng Entro và Negen nhé :D"
+                            "Chào mọi người, cảm ơn các bạn đã ghé thăm thế giới ThearFidel! Đừng quên ghé mục World Building -> Năng Lượng & Kỹ Năng để tìm hiểu song song 2 nguồn năng lượng Entro và Negen nhé :D"
                         </p>
                     </div>
                     <div class="pt-6">
@@ -531,9 +553,9 @@
                                         <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
                                     </div>
                                     <div class="wiki-submenu">
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'entro-1', 'Năng Lượng & Kỹ Năng / Entro / Bản Chất')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Bản chất Entro vũ trụ</a>
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'entro-2', 'Năng Lượng & Kỹ Năng / Entro / Biểu Hiện Phân Rã')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Biểu hiện sinh - lão - bệnh - tử</a>
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'entro-3', 'Năng Lượng & Kỹ Năng / Entro / Phép Thuật')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Kiểm soát Phép thuật Entro</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'card-entro-block', 'Năng Lượng & Kỹ Năng / Entro / Bản Chất')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Bản chất Entro vũ trụ</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'card-entro-block', 'Năng Lượng & Kỹ Năng / Entro / Biểu Hiện')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Biểu hiện phân rã & biến đổi</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'card-entro-block', 'Năng Lượng & Kỹ Năng / Entro / Phép Thuật')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Kiểm soát Phép thuật Entro</a>
                                     </div>
                                 </div>
                                 <!-- Submenu: Negen -->
@@ -546,13 +568,13 @@
                                         <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
                                     </div>
                                     <div class="wiki-submenu">
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'negen-1', 'Năng Lượng & Kỹ Năng / Negen / Sinh Khí')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Năng lượng sinh tồn nguyên thủy</a>
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'negen-2', 'Năng Lượng & Kỹ Năng / Negen / Kìm Hãm Phân Rã')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Kìm hãm Entro & Chữa lành</a>
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'negen-3', 'Năng Lượng & Kỹ Năng / Negen / Đối Trọng')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Sự cân bằng song hệ</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'card-negen-block', 'Năng Lượng & Kỹ Năng / Negen / Sinh Khí')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Năng lượng sinh tồn nguyên thủy</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'card-negen-block', 'Năng Lượng & Kỹ Năng / Negen / Kìm Hãm')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Kìm hãm Entro & Chữa lành</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'card-negen-block', 'Năng Lượng & Kỹ Năng / Negen / Đối Trọng')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Sự cân bằng song hệ</a>
                                     </div>
                                 </div>
                                 <div class="h-[1px] bg-slate-800 my-1"></div>
-                                <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'all-skills', 'Năng Lượng & Kỹ Năng / Tổng Quan Cả Hai Hệ')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-indigo-400 font-semibold">Xem toàn bộ hệ thống</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('skills', 'card-entro-block', 'Năng Lượng & Kỹ Năng / Toàn Bộ Hệ Thống')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-indigo-400 font-semibold">Xem toàn bộ hệ thống</a>
                             </div>
                         </div>
 
@@ -570,8 +592,8 @@
                                         <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
                                     </div>
                                     <div class="wiki-submenu">
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'char-mid', 'Nhân Vật / Mid (Nhân vật chính)')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-indigo-300 hover:text-white">Mid (Người phàm)</a>
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'char-eliza', 'Nhân Vật / Eliza (Người được chọn)')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-violet-300 hover:text-white">Eliza (Người được chọn)</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'card-char-mid', 'Nhân Vật / Mid (Nhân vật chính)')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-indigo-300 hover:text-white">Mid (Người phàm)</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'card-char-eliza', 'Nhân Vật / Eliza (Người được chọn)')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-violet-300 hover:text-white">Eliza (Người được chọn)</a>
                                     </div>
                                 </div>
                                 <div class="wiki-sub-item">
@@ -580,8 +602,8 @@
                                         <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
                                     </div>
                                     <div class="wiki-submenu">
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'all-chars', 'Nhân Vật / Phe Thợ Săn Rừng Sâu')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Thợ Săn Rừng Sâu</a>
-                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'all-chars', 'Nhân Vật / Kẻ Truy Đuổi')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Quân Đoàn Truy Đuổi</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'card-char-mid', 'Nhân Vật / Phe Thợ Săn')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Thợ Săn Rừng Sâu</a>
+                                        <a href="javascript:void(0)" onclick="viewWikiArticle('characters', 'card-char-eliza', 'Nhân Vật / Quân Đoàn Truy Đuổi')" class="block px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white">Quân Đoàn Truy Đuổi</a>
                                     </div>
                                 </div>
                             </div>
@@ -595,9 +617,9 @@
                                 <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
                             </button>
                             <div class="wiki-dropdown-menu">
-                                <a href="javascript:void(0)" onclick="viewWikiArticle('races', 'race-mortals', 'Chủng Tộc / Loài Người Phàm (Mortals)')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Loài Người Phàm (Mortals)</a>
-                                <a href="javascript:void(0)" onclick="viewWikiArticle('races', 'race-mutants', 'Chủng Tộc / Thực Thể Biến Dị Entro')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Dị Thể Hấp Thụ Entro</a>
-                                <a href="javascript:void(0)" onclick="viewWikiArticle('races', 'race-negen', 'Chủng Tộc / Linh Tộc Negen')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Linh Tộc Nuôi Dưỡng Negen</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('races', 'card-race-mortals', 'Chủng Tộc / Loài Người Phàm (Mortals)')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Loài Người Phàm (Mortals)</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('races', 'card-race-mutants', 'Chủng Tộc / Thực Thể Biến Dị Entro')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Dị Thể Hấp Thụ Entro</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('races', 'card-race-negen', 'Chủng Tộc / Linh Tộc Negen')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Linh Tộc Nuôi Dưỡng Negen</a>
                             </div>
                         </div>
 
@@ -609,9 +631,8 @@
                                 <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
                             </button>
                             <div class="wiki-dropdown-menu">
-                                <a href="javascript:void(0)" onclick="viewWikiArticle('history', 'hist-epochs', 'Lịch Sử / Các Kỷ Nguyên Suy Tàn')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Kỷ Nguyên Suy Tàn & Tái Thiết</a>
-                                <a href="javascript:void(0)" onclick="viewWikiArticle('history', 'hist-forest', 'Địa Lý / Khu Rừng ThearFidel')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Khu Rừng Nguyên Sinh ThearFidel</a>
-                                <a href="javascript:void(0)" onclick="viewWikiArticle('history', 'hist-border', 'Địa Lý / Vùng Lãnh Nguyên Biên Giới')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Vùng Lãnh Nguyên Biên Giới</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('history', 'card-hist-epochs', 'Lịch Sử / Các Kỷ Nguyên Suy Tàn')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Kỷ Nguyên Suy Tàn & Tái Thiết</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('history', 'card-hist-forest', 'Địa Lý / Khu Rừng ThearFidel')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Khu Rừng Nguyên Sinh ThearFidel</a>
                             </div>
                         </div>
 
@@ -623,8 +644,8 @@
                                 <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
                             </button>
                             <div class="wiki-dropdown-menu">
-                                <a href="javascript:void(0)" onclick="viewWikiArticle('items', 'items-decay', 'Vật Phẩm / Cổ Vật Trì Hoãn Entro')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Cổ Vật Trì Hoãn Phân Rã</a>
-                                <a href="javascript:void(0)" onclick="viewWikiArticle('items', 'items-crystal', 'Vật Phẩm / Thạch Sinh Mệnh Negen')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Thạch Sinh Mệnh Khuếch Đại Negen</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('items', 'card-items-decay', 'Vật Phẩm / Cổ Vật Trì Hoãn Entro')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Cổ Vật Trì Hoãn Phân Rã</a>
+                                <a href="javascript:void(0)" onclick="viewWikiArticle('items', 'card-items-crystal', 'Vật Phẩm / Thạch Sinh Mệnh Negen')" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white">Thạch Sinh Mệnh Khuếch Đại Negen</a>
                             </div>
                         </div>
 
@@ -637,6 +658,7 @@
                 </div>
             </div>
 
+            <!-- Wiki Content Display Box -->
             <div id="wiki-content-area" class="space-y-6">
                 <!-- DEFAULT LANDING: VISUAL BACKGROUND & CHARACTER SHOWCASE -->
                 <div id="wiki-landing" class="space-y-6 animate-fadeIn">
@@ -655,7 +677,7 @@
                                 </p>
                             </div>
                             <div class="flex items-center space-x-2">
-                                <button onclick="viewWikiArticle('skills', 'entro-1', 'Năng Lượng & Kỹ Năng / Entro')" class="px-4 py-2 rounded-xl bg-indigo-600/90 hover:bg-indigo-600 text-white text-xs font-semibold shadow-lg backdrop-blur-md transition flex items-center space-x-1.5">
+                                <button onclick="viewWikiArticle('skills', 'card-entro-block', 'Năng Lượng & Kỹ Năng / Entro')" class="px-4 py-2 rounded-xl bg-indigo-600/90 hover:bg-indigo-600 text-white text-xs font-semibold shadow-lg backdrop-blur-md transition flex items-center space-x-1.5">
                                     <span>Hệ Thống Entro</span>
                                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                                 </button>
@@ -666,7 +688,7 @@
                     <!-- Character Concept Posters Showcase (Mid & Eliza) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Card 1: Mid -->
-                        <div onclick="viewWikiArticle('characters', 'char-mid', 'Nhân Vật / Mid (Nhân vật chính)')" class="group relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 p-6 hover:border-indigo-500/60 transition duration-300 cursor-pointer shadow-xl">
+                        <div onclick="viewWikiArticle('characters', 'card-char-mid', 'Nhân Vật / Mid (Nhân vật chính)')" class="group relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 p-6 hover:border-indigo-500/60 transition duration-300 cursor-pointer shadow-xl">
                             <div class="flex items-center space-x-5">
                                 <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 flex-shrink-0 group-hover:scale-105 transition duration-300">
                                     <img src="https://placehold.co/300x300/1e293b/6366f1?text=MID" alt="Mid" class="w-full h-full object-cover">
@@ -689,7 +711,7 @@
                         </div>
 
                         <!-- Card 2: Eliza -->
-                        <div onclick="viewWikiArticle('characters', 'char-eliza', 'Nhân Vật / Eliza (Người được chọn)')" class="group relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 p-6 hover:border-violet-500/60 transition duration-300 cursor-pointer shadow-xl">
+                        <div onclick="viewWikiArticle('characters', 'card-char-eliza', 'Nhân Vật / Eliza (Người được chọn)')" class="group relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 p-6 hover:border-violet-500/60 transition duration-300 cursor-pointer shadow-xl">
                             <div class="flex items-center space-x-5">
                                 <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 flex-shrink-0 group-hover:scale-105 transition duration-300">
                                     <img src="https://placehold.co/300x300/1e293b/a855f7?text=ELIZA" alt="Eliza" class="w-full h-full object-cover">
@@ -885,8 +907,8 @@
                     <p class="text-slate-300 text-xs sm:text-sm mt-1">Cập nhật vị trí nhân vật (Mid & Eliza), biên giới quốc gia và vùng Entro/Negen đậm đặc.</p>
                 </div>
             </div>
-            <div class="relative w-full h-[500px] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl flex items-center justify-center">
-                <img src="https://placehold.co/1200x700/0f172a/334155?text=THEARFIDEL+MAP+OVERVIEW" alt="Map" class="w-full h-full object-cover opacity-60">
+            <div class="relative w-full h-[550px] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl flex items-center justify-center">
+                <img src="images/map.png" alt="Bản Đồ ThearFidel" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/1200x700/0f172a/334155?text=THEARFIDEL+MAP+OVERVIEW'">
             </div>
         </section>
 
@@ -895,6 +917,11 @@
             <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
                 <span class="px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 text-xs font-semibold border border-violet-500/20">Behind The Scenes</span>
                 <h2 class="text-2xl font-extrabold text-white mt-2">WIP Sketches & Kịch Bản Văn Bản</h2>
+                <p class="text-slate-300 text-xs sm:text-sm mt-1">Góc hậu trường ghi chép ý tưởng, storyboard và bản thảo phác thảo của tác giả.</p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center text-slate-400 text-sm">
+                <i class="fa-solid fa-pen-ruler text-3xl text-indigo-400 mb-3 block"></i>
+                Đang cập nhật các bản phác thảo Storyboard cho Chương tiếp theo...
             </div>
         </section>
 
@@ -956,12 +983,13 @@
         </div>
     </footer>
 
+    <!-- COMPLETE JAVASCRIPT LOGIC -->
     <script>
         let isAuthorAuthenticated = false;
         let isEditModeActive = false;
         let currentChapterNum = 12;
 
-        // DỮ LIỆU CÁC CHƯƠNG VÀ DANH SÁCH ẢNH (BẠN CHỈ CẦN THAY LINK ẢNH VÀO ĐÂY)
+        // DỮ LIỆU CÁC CHƯƠNG VÀ DANH SÁCH ẢNH
         const CHAPTERS_DATA = {
             12: {
                 title: "Chương 12: Cuộc Gặp Gỡ Trong Khu Rừng ThearFidel",
@@ -987,8 +1015,7 @@
                 date: "05/10/2026",
                 views: "3,850 lượt xem",
                 pages: [
-                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.10+Trang+1",
-                    "https://placehold.co/800x1200/1e293b/4f46e5?text=ThearFidel+Ch.10+Trang+2"
+                    "https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.10+Trang+1"
                 ]
             },
             9: {
@@ -1067,25 +1094,60 @@
         };
 
         window.onload = function() {
-            // Load saved custom edits from localStorage
-            const savedData = JSON.parse(localStorage.getItem('thearfidel_saved_content') || '{}');
-            for (const [id, htmlContent] of Object.entries(savedData)) {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.innerHTML = htmlContent;
+            // Load custom edits from localStorage
+            try {
+                const savedData = JSON.parse(localStorage.getItem('thearfidel_saved_content') || '{}');
+                for (const [id, htmlContent] of Object.entries(savedData)) {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = htmlContent;
                 }
+
+                if (localStorage.getItem('thearfidel_author_auth') === 'true') {
+                    isAuthorAuthenticated = true;
+                    updateAuthorUIState();
+                }
+            } catch (e) {
+                console.error("Storage load error:", e);
             }
 
-            // Check if author was previously authenticated in this session
-            if (localStorage.getItem('thearfidel_author_auth') === 'true') {
-                isAuthorAuthenticated = true;
-                updateAuthorUIState();
-            }
-
-            // Render default chapter
             renderChapterPages(currentChapterNum);
         };
 
+        // TAB SWITCHING FUNCTION (TRANG CHỦ, ĐỌC TRUYỆN, WORLD, MAP, WIP)
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show selected tab
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) {
+                targetTab.classList.remove('hidden');
+            }
+
+            // Update header button styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800/40 text-slate-400";
+            });
+
+            const activeNavBtn = document.getElementById('nav-' + tabId);
+            if (activeNavBtn) {
+                activeNavBtn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-indigo-400 bg-slate-800/60";
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // MOBILE MENU TOGGLE
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        // RENDER CHAPTER PAGES
         function renderChapterPages(chNum) {
             const container = document.getElementById('comic-panels-container');
             if (!container) return;
@@ -1096,13 +1158,11 @@
                 pages: [`https://placehold.co/800x1200/1e293b/6366f1?text=ThearFidel+Ch.${chNum}+Trang+1`]
             };
 
-            // Update views display
             const viewCountEl = document.getElementById('view-count');
             if (viewCountEl && chapterInfo.views) {
                 viewCountEl.innerText = chapterInfo.views;
             }
 
-            // Generate HTML for each panel
             container.innerHTML = chapterInfo.pages.map((imgUrl, index) => `
                 <div class="w-full bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-md">
                     <img src="${imgUrl}" alt="Chương ${chNum} - Trang ${index + 1}" class="w-full h-auto object-cover" loading="lazy" onerror="this.src='https://placehold.co/800x1200/1e293b/fff?text=Trang+${index + 1}'">
@@ -1110,6 +1170,7 @@
             `).join('');
         }
 
+        // CHANGE CHAPTER
         function changeChapter(chNum) {
             currentChapterNum = parseInt(chNum);
             const selectEl = document.getElementById('chapter-select');
@@ -1124,7 +1185,6 @@
             const progressText = document.getElementById('chapter-progress-text');
             if (progressText) progressText.innerText = `${currentChapterNum} / 12 Chương`;
 
-            // Highlight sidebar list
             document.querySelectorAll('.chapter-item').forEach(item => {
                 item.className = "chapter-item p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition flex items-center justify-between";
                 const icon = item.querySelector('i');
@@ -1146,11 +1206,8 @@
                 if (activeTitle) activeTitle.className = "text-xs font-bold text-white";
             }
 
-            // Render actual images for this chapter
             renderChapterPages(currentChapterNum);
-
             switchTab('reader');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function selectChapter(chNum) {
@@ -1158,14 +1215,22 @@
         }
 
         function prevChapter() {
-            if (currentChapterNum > 1) {
-                changeChapter(currentChapterNum - 1);
-            }
+            if (currentChapterNum > 1) changeChapter(currentChapterNum - 1);
         }
 
         function nextChapter() {
-            if (currentChapterNum < 12) {
-                changeChapter(currentChapterNum + 1);
+            if (currentChapterNum < 12) changeChapter(currentChapterNum + 1);
+        }
+
+        function setReadingMode(mode) {
+            const btnWebtoon = document.getElementById('mode-webtoon');
+            const btnPage = document.getElementById('mode-page');
+            if (mode === 'webtoon') {
+                if (btnWebtoon) btnWebtoon.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition";
+                if (btnPage) btnPage.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition";
+            } else {
+                if (btnPage) btnPage.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition";
+                if (btnWebtoon) btnWebtoon.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition";
             }
         }
 
@@ -1191,6 +1256,148 @@
                     let count = parseInt(countEl.innerText || '148');
                     countEl.innerText = count + 1;
                 }
+            }
+        }
+
+        // ================= WIKI SYSTEM FUNCTIONS =================
+        function viewWikiArticle(section, targetId, breadcrumbText) {
+            const landing = document.getElementById('wiki-landing');
+            if (landing) landing.classList.add('hidden');
+
+            document.querySelectorAll('.wiki-section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
+
+            const targetSection = document.getElementById('wiki-' + section);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+
+            const breadcrumbEl = document.getElementById('wiki-breadcrumb');
+            if (breadcrumbEl && breadcrumbText) {
+                breadcrumbEl.innerText = breadcrumbText;
+            }
+
+            if (targetId) {
+                const targetCard = document.getElementById(targetId);
+                if (targetCard) {
+                    setTimeout(() => {
+                        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetCard.classList.remove('highlight-pulse');
+                        void targetCard.offsetWidth;
+                        targetCard.classList.add('highlight-pulse');
+                    }, 50);
+                }
+            }
+        }
+
+        function resetWikiToLanding() {
+            document.querySelectorAll('.wiki-section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
+
+            const landing = document.getElementById('wiki-landing');
+            if (landing) landing.classList.remove('hidden');
+
+            const breadcrumbEl = document.getElementById('wiki-breadcrumb');
+            if (breadcrumbEl) {
+                breadcrumbEl.innerText = "Tổng Quan / Visual Showcase";
+            }
+        }
+
+        // ================= AUTHOR MODE & SECURITY =================
+        function openAuthorModal() {
+            if (isAuthorAuthenticated) {
+                toggleEditMode();
+                return;
+            }
+            const modal = document.getElementById('author-modal');
+            const errorText = document.getElementById('author-login-error');
+            const passInput = document.getElementById('author-password-input');
+            if (modal) modal.classList.remove('hidden');
+            if (errorText) errorText.classList.add('hidden');
+            if (passInput) {
+                passInput.value = '';
+                passInput.focus();
+            }
+        }
+
+        function closeAuthorModal() {
+            const modal = document.getElementById('author-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function verifyAuthorPassword() {
+            const passInput = document.getElementById('author-password-input');
+            const errorText = document.getElementById('author-login-error');
+            if (passInput && passInput.value === 'minhidle2026') {
+                isAuthorAuthenticated = true;
+                localStorage.setItem('thearfidel_author_auth', 'true');
+                closeAuthorModal();
+                updateAuthorUIState();
+                toggleEditMode(true);
+            } else {
+                if (errorText) errorText.classList.remove('hidden');
+            }
+        }
+
+        function updateAuthorUIState() {
+            const btnText = document.getElementById('author-btn-text');
+            const icon = document.getElementById('author-lock-icon');
+            if (isAuthorAuthenticated) {
+                if (btnText) btnText.innerText = "Tác Giả (Đã Mở)";
+                if (icon) icon.className = "fa-solid fa-lock-open text-emerald-400";
+            } else {
+                if (btnText) btnText.innerText = "Chế độ Tác giả (Khóa)";
+                if (icon) icon.className = "fa-solid fa-lock text-amber-400";
+            }
+        }
+
+        function toggleEditMode(forceState) {
+            if (!isAuthorAuthenticated) {
+                openAuthorModal();
+                return;
+            }
+
+            if (forceState !== undefined) {
+                isEditModeActive = forceState;
+            } else {
+                isEditModeActive = !isEditModeActive;
+            }
+
+            const banner = document.getElementById('author-edit-banner');
+            if (banner) {
+                if (isEditModeActive) {
+                    banner.classList.remove('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                }
+            }
+
+            document.querySelectorAll('[data-editable="true"]').forEach(el => {
+                if (isEditModeActive) {
+                    el.setAttribute('contenteditable', 'true');
+                    el.classList.add('editable-active');
+                } else {
+                    el.removeAttribute('contenteditable');
+                    el.classList.remove('editable-active');
+                }
+            });
+        }
+
+        function saveAllChanges() {
+            const dataToSave = {};
+            document.querySelectorAll('[data-editable="true"]').forEach(el => {
+                if (el.id) {
+                    dataToSave[el.id] = el.innerHTML;
+                }
+            });
+
+            try {
+                localStorage.setItem('thearfidel_saved_content', JSON.stringify(dataToSave));
+                alert('Đã lưu mọi thay đổi của bạn thành công!');
+            } catch (e) {
+                alert('Lỗi khi lưu dữ liệu!');
             }
         }
 
